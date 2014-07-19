@@ -9,5 +9,6 @@ First attempt at a Chrome Extension
 #Usage
 1. Load as a unpackaged chrome extension.
 2. Select a number to convert
-3. Select which conversion path
-4. Hope it doesn't break!
+3. Right click and go to the KingConverter context menu 
+4. Select which conversion path
+5. Hope it doesn't break!
