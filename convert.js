@@ -1,5 +1,4 @@
-var listids = [];
-var fakeId = 0;
+var listids = 0;
 var origId;
 String.prototype.regexLastIndexOf = function(regex) { 
   var lastIndexOf = -1;
@@ -34,8 +33,8 @@ function parseNum(str,convfactor,convstring) {
 }
 
 function revert(info,tab) {
-  listids.pop();
-  if(listids.length === 0) {
+  listids--;
+  if(listids === 0) {
     chrome.contextMenus.remove(origId);
   }
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -48,12 +47,12 @@ function converterkgtolbs(info, tab) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {"toReplace": toReturn, "original":info.selectionText});
   });
-  if(listids.length===0) {
+  if(listids === 0) {
     origId = chrome.contextMenus.create({"title":"Revert last change",
                               "contexts":["all"],
                               "onclick":revert});
   }
-  listids.push(fakeId);
+  listids++;
 }
 
 function converterlbstokgs(info, tab) {
@@ -62,12 +61,12 @@ function converterlbstokgs(info, tab) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {"toReplace": toReturn, "original":info.selectionText});
   });
-  if(listids.length===0) {
+  if(listids === 0) {
     origId = chrome.contextMenus.create({"title":"Revert last change",
                               "contexts":["all"],
                               "onclick":revert});
   }
-  listids.push(fakeId);
+  listids++;
 }
 
 
