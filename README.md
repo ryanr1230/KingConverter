@@ -1,4 +1,14 @@
 KingConverter
 =============
+###Author: Ryan Rice
 
-First attempt at chrome extension
+
+First attempt at a Chrome Extension
+
+
+#Usage
+1. Load as a unpackaged chrome extension.
+2. Select a number to convert
+3. Right click and go to the KingConverter context menu 
+4. Select which conversion path
+5. Hope it doesn't break!
