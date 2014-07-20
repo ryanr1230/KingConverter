@@ -167,11 +167,39 @@ function createSpeedConversions() {
   });
 }
 
+function createCurrencyConversions() {
+  var currencyconv = chrome.contextMenus.create({"title":"Currency Conversions",
+                                                  "contexts":["selection"]});
+  $.get("https://www.google.com/finance/converter?a=1&from=USD&to=EUR", function(data) {
+      var inputStr = $(data).find('.bld').text();
+      var rate = inputStr.substring(0,inputStr.lastIndexOf(' '));
+      chrome.contextMenus.create({"title":"Convert %s (USD->EUR)",
+        "contexts":["selection"],
+        "parentId":currencyconv,
+        "onclick":function(info,tab) {
+          converter(info,tab,rate,"(EUR)");                      
+        }
+      });  
+  });
+  $.get("https://www.google.com/finance/converter?a=1&from=EUR&to=USD", function(data) {
+      var inputStr = $(data).find('.bld').text();
+      var rate = inputStr.substring(0,inputStr.lastIndexOf(' '));
+      chrome.contextMenus.create({"title":"Convert %s (EUR->USD)",
+        "contexts":["selection"],
+        "parentId":currencyconv,
+        "onclick":function(info,tab) {
+          converter(info,tab,rate,"(USD)");                      
+        }
+      });  
+  });
+}
+
 function createDefaults() {
   createWeightConversions();
   createLengthConversions();
   createVolumeConversions();
   createSpeedConversions();
+  createCurrencyConversions();
 }
 
 
