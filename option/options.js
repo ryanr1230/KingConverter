@@ -46,6 +46,21 @@ function add_options() {
   });
 }
 
+function add_currency_options() {
+  chrome.storage.sync.get(function(Items) {
+    var inFirstCurr = document.getElementById('to').value;
+    var inSecondCurr = document.getElementById('from').value;
+    var newUserCurrencyConv = Items.userCurrencyConv;
+    newUserCurrencyConv.push({"firstCurr":inFirstCurr, "secondCurr":inSecondCurr});
+    newUserCurrencyConv.push({"firstCurr":inSecondCurr, "secondCurr":inFirstCurr});
+    chrome.storage.sync.set({userCurrencyConv:newUserCurrencyConv}, function() {
+      var status = document.getElementById('status');
+      status.textContent = 'Currency options added.';
+      relist();
+    });
+  });
+}
+
 
 function delete_options() {
   chrome.storage.sync.get(function(Items) {
@@ -64,14 +79,16 @@ function delete_options() {
   });
 }
 
+
+
+
 function delete_all_options() {
-  chrome.storage.sync.get(function(Items) {
-    var newUserConv = [];
-    chrome.storage.sync.set({userConv:newUserConv}, function() {
-      var status = document.getElementById('status');
-      status.textContent = 'Options deleted.';
-      relist();
-    });
+  var newUserConv = [];
+  var newUserCurrencyConv = [{"firstCurr":'USD', "secondCurr":'EUR'},{"firstCurr":'EUR', "secondCurr":'USD'}];
+  chrome.storage.sync.set({userConv:newUserConv, userCurrencyConv:newUserCurrencyConv}, function() {
+    var status = document.getElementById('status');
+    status.textContent = 'Options deleted.';
+    relist();
   });
 }
 
@@ -81,5 +98,7 @@ document.getElementById('delete').addEventListener('click',
     delete_options);
 document.getElementById('add').addEventListener('click',
     add_options);
+document.getElementById('addcurren').addEventListener('click',
+    add_currency_options);
 document.getElementById('delete_all').addEventListener('click',
     delete_all_options);

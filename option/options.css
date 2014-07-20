@@ -5,7 +5,7 @@ h1 {
 h2 {
 	text-align:center;
 }
-p {
+p, div {
 	clear:left;
 	text-align: center;
 }
@@ -23,6 +23,13 @@ button {
     font-weight:800;
     font-family:Verdana;
     font-size: 12px;
+}
+select {
+    width:20%;
+    margin: 0px 40% 0px 40%;
+}
+option {
+    text-align: center;
 }
 img {
     display:block;

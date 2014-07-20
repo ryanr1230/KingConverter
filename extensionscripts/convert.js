@@ -24,7 +24,7 @@ function removeRevertOption () {
   }
 }
 
-function parseNum(str,convfactor,convstring) {
+function parseNum(str,convfactor,convstring,callback) {
   
   var nextStr = str.replace(',','');
   var firstNumInd = nextStr.regexIndexOf(/\d/g);
@@ -33,10 +33,11 @@ function parseNum(str,convfactor,convstring) {
   var after = nextStr.substring(lastNumInd);
   var toMult = parseFloat(nextStr.substring(firstNumInd,lastNumInd));
   if(isNaN(toMult)) {
-    return null;
+    callback(null);
   } else {
-    return before + (toMult*convfactor).toFixed(2); + convstring + after; 
+    callback(before + (toMult*convfactor).toFixed(2) + convstring + after);
   } 
+  
 }
 
 function revert(info,tab) {
@@ -50,148 +51,83 @@ function revert(info,tab) {
 }
 
 function converter(info, tab, conversionFactor, tag) {
-
-  var parsed = parseNum(info.selectionText,conversionFactor,(tag === null) ? "" : tag);
-  var toReturn = (parsed === null) ? info.selectionText : parsed;
-  chrome.tabs.query({active:true,currentWindow:true},function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {"toReplace" : toReturn, "original":info.selectionText});
+  console.log(conversionFactor+ " " + tag);
+  parseNum(info.selectionText,conversionFactor,(tag === null) ? "" : tag, function(parsed) {
+    var toReturn = (parsed === null) ? info.selectionText : parsed;
+    chrome.tabs.query({active:true,currentWindow:true},function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {"toReplace" : toReturn, "original":info.selectionText});
+    });
+    if(listids === 0) {
+      origId = chrome.contextMenus.create({"title":"Revert last change", 
+                                "contexts":["all"],
+                                "onclick":revert});
+    }
+    listids++;
   });
-  if(listids === 0) {
-    origId = chrome.contextMenus.create({"title":"Revert last change", 
-                              "contexts":["all"],
-                              "onclick":revert});
-  }
-  listids++;
 }
+
+function createContextMenusFromList(list,parentId) {
+  $.each(list,function(index) {
+    chrome.contextMenus.create({"title":"Convert %s (" + list[index].from + "->" + list[index].to + ")",
+                                "contexts":["selection"],
+                                "parentId":parentId,
+                                "onclick":function(info,tab) {
+        console.log(index);
+        console.log(list[index]);        
+        converter(info,tab,list[index].factor,'('+ list[index].to + ')');                       
+      }
+    });
+  });
+}
+
 function createWeightConversions() {
+  var weightconvlist = [{'from':'lbs','to':'kgs','factor':.453592},
+                        {'from':'kgs','to':'lbs','factor':2.20462}];
   var weightconv = chrome.contextMenus.create({"title":"Weight Conversions",
                                                 "contexts":["selection"]});
-  chrome.contextMenus.create({"title":"Convert %s (lbs->kgs)",
-                              "contexts":["selection"],
-                              "parentId":weightconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,.453592,"(kgs)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (kgs->lbs)",
-                              "contexts":["selection"],
-                              "parentId":weightconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,2.20462,"(lbs)")                       
-    }
-  });
+  createContextMenusFromList(weightconvlist,weightconv);
 }
 
 function createLengthConversions() {
+  lengthconvlist = [{'from':'m','to':'ft','factor':3.28084},
+                    {'from':'ft','to':'m','factor':0.3048},
+                    {'from':'km','to':'mi','factor':0.621371},
+                    {'from':'mi','to':'km','factor':1.60934},
+                    {'from':'in','to':'cm','factor':2.54},
+                    {'from':'cm','to':'in','factor':0.393701}];
   var lengthconv = chrome.contextMenus.create({"title":"Length Conversions",
                                                 "contexts":["selection"]});
-  chrome.contextMenus.create({"title":"Convert %s (m->ft)",
-                              "contexts":["selection"],
-                              "parentId":lengthconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,3.28084,"(ft)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (ft->m)",
-                              "contexts":["selection"],
-                              "parentId":lengthconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,0.3048,"(m)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (km->mi)",
-                              "contexts":["selection"],
-                              "parentId":lengthconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,0.621371,"(mi)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (mi->km)",
-                              "contexts":["selection"],
-                              "parentId":lengthconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,1.60934,"(km)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (in->cm)",
-                              "contexts":["selection"],
-                              "parentId":lengthconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,2.54,"(cm)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (cm->in)",
-                              "contexts":["selection"],
-                              "parentId":lengthconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,0.393701,"(in)")                       
-    }
-  });
+  createContextMenusFromList(lengthconvlist,lengthconv);
 }
 
 function createVolumeConversions() {
+  var volconvlist = [{'from':'gal','to':'L','factor':3.785},
+                        {'from':'L','to':'gal','factor':0.264}];
   var volconv = chrome.contextMenus.create({"title":"Volume Conversions",
                                                 "contexts":["selection"]});
-  chrome.contextMenus.create({"title":"Convert %s (gal->L)",
-                              "contexts":["selection"],
-                              "parentId":volconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,3.785,"(L)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (L->gal)",
-                              "contexts":["selection"],
-                              "parentId":volconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,0.264,"(gal)")                       
-    }
-  });
+  createContextMenusFromList(volconvlist,volconv);
 }
 
 function createSpeedConversions() {
+  var speedconvlist = [{'from':'kmph','to':'mph','factor':0.621371},
+                       {'from':'mph','to':'kmph','factor':1.60934}];
   var speedconv = chrome.contextMenus.create({"title":"Speed Conversions",
                                                 "contexts":["selection"]});
-  chrome.contextMenus.create({"title":"Convert %s (kmph->mph)",
-                              "contexts":["selection"],
-                              "parentId":speedconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,0.621371,"(mph)")                       
-    }
-  });
-  chrome.contextMenus.create({"title":"Convert %s (mph->kmph)",
-                              "contexts":["selection"],
-                              "parentId":speedconv,
-                              "onclick":function(info,tab) {
-      converter(info,tab,1.60934,"(kmph)")                       
-    }
-  });
+  createContextMenusFromList(speedconvlist,speedconv);
 }
 
-function createCurrencyConversions() {
+function createCurrencyConversions(Items) {
   var currencyconv = chrome.contextMenus.create({"title":"Currency Conversions",
                                                   "contexts":["selection"]});
-  $.get("https://www.google.com/finance/converter?a=1&from=USD&to=EUR", function(data) {
-      var inputStr = $(data).find('.bld').text();
-      var rate = inputStr.substring(0,inputStr.lastIndexOf(' '));
-      chrome.contextMenus.create({"title":"Convert %s (USD->EUR)",
-        "contexts":["selection"],
-        "parentId":currencyconv,
-        "onclick":function(info,tab) {
-          converter(info,tab,rate,"(EUR)");                      
-        }
-      });  
-  });
-  $.get("https://www.google.com/finance/converter?a=1&from=EUR&to=USD", function(data) {
-      var inputStr = $(data).find('.bld').text();
-      var rate = inputStr.substring(0,inputStr.lastIndexOf(' '));
-      chrome.contextMenus.create({"title":"Convert %s (EUR->USD)",
-        "contexts":["selection"],
-        "parentId":currencyconv,
-        "onclick":function(info,tab) {
-          converter(info,tab,rate,"(USD)");                      
-        }
-      });  
-  });
+  $.each(Items.userCurrencyConv,function(index) {
+    var rate = 1;
+    $.get("https://www.google.com/finance/converter?a=1&from=" + Items.userCurrencyConv[index].firstCurr + "&to=" + Items.userCurrencyConv[index].secondCurr,
+      function(data) {
+        var inputStr = $(data).find('.bld').text();
+        rate = inputStr.substring(0,inputStr.lastIndexOf(' '));
+        createContextMenusFromList([{'from':Items.userCurrencyConv[index].firstCurr,'to':Items.userCurrencyConv[index].secondCurr,'factor':rate}],currencyconv);
+    });
+  }); 
 }
 
 function createDefaults() {
@@ -199,13 +135,23 @@ function createDefaults() {
   createLengthConversions();
   createVolumeConversions();
   createSpeedConversions();
-  createCurrencyConversions();
 }
 
+function setDefaultCurrencyConv() {
+  var newUserCurrencyConv = [{"firstCurr":'USD', "secondCurr":'EUR'},{"firstCurr":'EUR', "secondCurr":'USD'}];
+  chrome.storage.sync.set({userCurrencyConv:newUserCurrencyConv});
+}
 
 function recreateUserConverts() {
   chrome.contextMenus.removeAll();
   chrome.storage.sync.get(function(Items) {
+    if(Items.userCurrencyConv === undefined) {
+      setDefaultCurrencyConv(function () {
+        createCurrencyConversions(Items);
+      });
+    } else {
+      createCurrencyConversions(Items);
+    }
     for(var j in Items.userConv) {
       chrome.contextMenus.create({"title":Items.userConv[j].title,
                                   "contexts":["selection"],
