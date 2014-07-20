@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head><title>KingConverter Extension Options</title></head>
+<body>
+
+<h1>Add a new conversion!</h1>
+
+<h2>Title: </h2>
+<p>
+Already inserts "Convert {selected}", add what the conversion does<br>
+Usually in the form "({unit}->{unit})"
+</p>
+<label>
+  <input type="text" id="title">
+</label>
+
+<h2>Conversion factor:</h2>
+<p>
+Input a number to multiply by
+</p>
+<label>
+  <input type="text" id="factor">
+</label>
+
+<h2>Tag</h2>
+<p> 
+Other words to insert at the end of the converted number (e.g. "(lbs)")
+</p>
+<label>
+  <input type="text" id="tag">
+</label>
+
+<div id="status"></div>
+<button id="add">Add</button>
+
+
+<br>
+
+<form id="listofadded" action=""> 
+</form>
+<br>
+<button id="delete">Delete</button>
+<br>
+<br>
+<br>
+<br>
+<br>
+<button id="delete_all">DELETE ALL OPTIONS</button>
+
+<script src="options.js"></script>
+</body>
+</html>

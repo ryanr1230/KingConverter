@@ -41,28 +41,16 @@ function revert(info,tab) {
     chrome.tabs.sendMessage(tabs[0].id, {"revert": "true"});
   })
 }
-function converterkgtolbs(info, tab) {
-  var parsed = parseNum(info.selectionText,2.20462,"(lbs)");
-  var toReturn = (parsed === null) ? info.selectionText : parsed;
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {"toReplace": toReturn, "original":info.selectionText});
-  });
-  if(listids === 0) {
-    origId = chrome.contextMenus.create({"title":"Revert last change",
-                              "contexts":["all"],
-                              "onclick":revert});
-  }
-  listids++;
-}
 
-function converterlbstokgs(info, tab) {
-  var parsed = parseNum(info.selectionText,0.453592,"(lbs)");
+function converter(info, tab, conversionFactor, tag) {
+
+  var parsed = parseNum(info.selectionText,conversionFactor,(tag === null) ? "" : tag);
   var toReturn = (parsed === null) ? info.selectionText : parsed;
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {"toReplace": toReturn, "original":info.selectionText});
+  chrome.tabs.query({active:true,currentWindow:true},function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {"toReplace" : toReturn, "original":info.selectionText});
   });
   if(listids === 0) {
-    origId = chrome.contextMenus.create({"title":"Revert last change",
+    origId = chrome.contextMenus.create({"title":"Revert last change", 
                               "contexts":["all"],
                               "onclick":revert});
   }
@@ -70,10 +58,41 @@ function converterlbstokgs(info, tab) {
 }
 
 
-chrome.contextMenus.create({"title":"Convert %s (kg->lbs)",
-                            "contexts":["selection"],
-                            "onclick":converterkgtolbs});
+function createDefaults() {
+  chrome.contextMenus.create({"title":"Convert %s (lbs->kgs)",
+                              "contexts":["selection"],
+                              "onclick":function(info,tab) {
+      converter(info,tab,.453592,"(kgs)")                       
+    }
+  });
+  chrome.contextMenus.create({"title":"Convert %s (kgs->lbs)",
+                              "contexts":["selection"],
+                              "onclick":function(info,tab) {
+      converter(info,tab,2.20462,"(lbs)")                       
+    }
+  });
+}
 
-chrome.contextMenus.create({"title":"Convert %s (lbs->kg)",
-                            "contexts":["selection"],
-                            "onclick":converterlbstokgs});
+
+function recreateUserConverts() {
+  chrome.contextMenus.removeAll();
+  createDefaults();
+  chrome.storage.sync.get(function(Items) {
+    for(var j in Items.userConv) {
+      chrome.contextMenus.create({"title":Items.userConv[j].title,
+                                  "contexts":["selection"],
+                                  "onclick":function(info,tab) { 
+         converter(info,tab,Items.userConv[j].factor,Items.userConv[j].tag);
+        }
+      }); 
+    } 
+  });
+}
+
+recreateUserConverts();
+
+
+
+chrome.storage.onChanged.addListener(function(changes,namespace) {
+  recreateUserConverts();
+});
