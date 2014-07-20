@@ -152,14 +152,14 @@ function recreateUserConverts() {
     } else {
       createCurrencyConversions(Items);
     }
-    for(var j in Items.userConv) {
-      chrome.contextMenus.create({"title":Items.userConv[j].title,
+    $.each(Items.userConv,function(index){
+      chrome.contextMenus.create({"title":Items.userConv[index].title,
                                   "contexts":["selection"],
                                   "onclick":function(info,tab) { 
-         converter(info,tab,Items.userConv[j].factor,Items.userConv[j].tag);
+         converter(info,tab,Items.userConv[index].factor,Items.userConv[index].tag);
         }
       }); 
-    } 
+    });
   });
   createDefaults();
 }
