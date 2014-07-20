@@ -35,7 +35,7 @@ function parseNum(str,convfactor,convstring) {
   if(isNaN(toMult)) {
     return null;
   } else {
-    return before + toMult*convfactor + convstring + after; 
+    return before + (toMult*convfactor).toFixed(2); + convstring + after; 
   } 
 }
 
