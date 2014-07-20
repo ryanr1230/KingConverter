@@ -1,0 +1,74 @@
+h1 {
+	text-align:center;
+}
+h2 {
+	text-align:center;
+}
+p {
+	clear:left;
+	text-align: center;
+}
+button {
+    border-radius:1 px;
+    border: 0px;
+    background-color: #d6b307;
+    color:#404040;
+    height:2.5em;
+    margin-left: 20%;
+    margin-right:20%;
+    width:60%;
+    font-weight:800;
+    font-family:Verdana;
+    font-size: 12px;
+}
+
+.inner {
+	color:#808080;
+}
+.radiobutton {
+	visibility:hidden ;
+}
+span {
+    clear: left;
+    display: block;
+    width: 50%;
+    font-size: 12px;
+}
+span:hover {
+	background-color:#e6c317;
+	opacity:.7;
+}
+#status {
+	margin:10px 10px 10px 10px;
+	text-align: center;
+	color:red;
+	font-family:Verdana;
+	font-size:14px;
+	font-weight:400;
+}
+:checked + span {
+    background-color:#e6c317;
+}
+
+span {
+	background-color:#ffffff;
+	text-align: center;
+	cursor:pointer;
+	color:#808080;
+	font-family:Verdana;
+	font-size:12px;
+	padding:10px 5%;
+	margin:5px 20% 5px 20%;
+	text-decoration:none;
+}
+input[type="text"]{
+    border: 2px solid #ccc;
+    color: #999;
+    margin-left: 20%;
+    margin-right:20%;
+    padding:2%;
+    width:56%;
+    text-indent:.5em;
+    font-size: 1em;
+    height: 2em;
+}

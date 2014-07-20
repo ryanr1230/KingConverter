@@ -1,22 +1,25 @@
 
 var listOfAdded = document.getElementById('listofadded');
+
 function relist () {
   chrome.storage.sync.get(function(Items) {
     listOfAdded.innerHTML = '';
     for(var q in Items.userConv) {
-      addRadioAdded(q,Items.userConv[q].title + " with conversion factor " + Items.userConv[q].factor + "and Tag" + Items.userConv[q].tag + "<br>");
+      addRadioAdded(q,Items.userConv[q].title + " with conversion factor " + Items.userConv[q].factor + " and Tag " + Items.userConv[q].tag + "<br>");
     }
   });
 }
 
 function addRadioAdded(value,inside) {
   var label = document.createElement('label');
+  label.setAttribute('class','containradio');
   var newRadio = document.createElement('input');
   newRadio.setAttribute('type','radio');
   newRadio.setAttribute('value',value);
   newRadio.setAttribute('name','added');
+  newRadio.setAttribute('class','radiobutton');
   label.appendChild(newRadio);
-  label.innerHTML += inside;
+  label.innerHTML += "<span>" + inside + "</span>";
   listOfAdded.appendChild(label);
 }
 
@@ -25,16 +28,21 @@ function add_options() {
     var inTitle = document.getElementById('title').value;
     var inFactor = document.getElementById('factor').value;
     var inTag = document.getElementById('tag').value;
-    var newUserConv = Items.userConv;
-    newUserConv.push({"title":"Convert %s " + inTitle, "factor":inFactor,"tag":inTag});
-    chrome.storage.sync.set({userConv:newUserConv}, function() {
+    if(inTitle != '' && !isNaN(inFactor)){
+      var newUserConv = Items.userConv;
+      newUserConv.push({"title":"Convert %s " + inTitle, "factor":inFactor,"tag":inTag});
+      chrome.storage.sync.set({userConv:newUserConv}, function() {
+        var status = document.getElementById('status');
+        status.textContent = 'Options added.';
+        relist();
+      });
+    } else if(inTitle!=''){
       var status = document.getElementById('status');
-      status.textContent = 'Options added.';
-      setTimeout(function() {
-        status.textContent = '';
-      }, 750);
-      relist();
-    });
+      status.textContent = 'Conversion factor must be a number';
+    } else {
+      var status = document.getElementById('status');
+      status.textContent = 'Title of conversion must contain something';
+    }
   });
 }
 
@@ -51,9 +59,6 @@ function delete_options() {
     chrome.storage.sync.set({userConv:newUserConv}, function() {
       var status = document.getElementById('status');
       status.textContent = 'Options deleted.';
-      setTimeout(function() {
-      status.textContent = '';
-      }, 750);
       relist();
     });
   });
@@ -65,9 +70,6 @@ function delete_all_options() {
     chrome.storage.sync.set({userConv:newUserConv}, function() {
       var status = document.getElementById('status');
       status.textContent = 'Options deleted.';
-      setTimeout(function() {
-      status.textContent = '';
-      }, 750);
       relist();
     });
   });
