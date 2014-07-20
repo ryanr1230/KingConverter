@@ -1,5 +1,5 @@
 var listids = 0;
-var origId;
+var origId = null;
 String.prototype.regexLastIndexOf = function(regex) { 
   var lastIndexOf = -1;
   var tempStr = this;
@@ -16,6 +16,13 @@ String.prototype.regexIndexOf = function(regex) {
   return this.search(regex);
 }
 
+function removeRevertOption () {
+  if(origId != null) {
+    chrome.contextMenus.remove(origId);
+    origId = null;
+    listids = 0;
+  }
+}
 
 function parseNum(str,convfactor,convstring) {
   
@@ -35,7 +42,7 @@ function parseNum(str,convfactor,convstring) {
 function revert(info,tab) {
   listids--;
   if(listids === 0) {
-    chrome.contextMenus.remove(origId);
+    removeRevertOption();
   }
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {"revert": "true"});
@@ -186,6 +193,9 @@ function recreateUserConverts() {
 recreateUserConverts();
 
 
+chrome.tabs.onUpdated.addListener(function(activeInfo) {
+  removeRevertOption();
+});
 
 chrome.storage.onChanged.addListener(function(changes,namespace) {
   recreateUserConverts();
