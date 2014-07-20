@@ -3,16 +3,16 @@ $(document).ready(function(){
   function replaceWith(text,original) {
       var taDom = window.getSelection().anchorNode.parentElement;
       var ta = $(taDom);
-      var inside = ta.text();
-      var newin = ta.text().replace(original,text,"g");
-      ta.text(newin);
+      var inside = ta.html();
+      var newin = ta.html().replace(original,text,"g");
+      ta.html(newin);
       toRevert.push({"item":taDom, "original":inside});
    }
 
   function revertLast() {
     var revertObj = toRevert[toRevert.length-1];
     toRevert.pop();
-    $(revertObj['item']).text(revertObj['original']);
+    $(revertObj['item']).html(revertObj['original']);
   }
 
   chrome.runtime.onMessage.addListener(
