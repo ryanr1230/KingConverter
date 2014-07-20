@@ -35,7 +35,7 @@ function parseNum(str,convfactor,convstring,callback) {
   if(isNaN(toMult)) {
     callback(null);
   } else {
-    callback(before + (toMult*convfactor).toFixed(2) + convstring + after);
+    callback(before + "<b>" + (toMult*convfactor).toFixed(2) + convstring + "</b>"+ after);
   } 
   
 }
@@ -74,7 +74,7 @@ function createContextMenusFromList(list,parentId) {
                                 "onclick":function(info,tab) {
         console.log(index);
         console.log(list[index]);        
-        converter(info,tab,list[index].factor,'('+ list[index].to + ')');                       
+        converter(info,tab,list[index].factor,'('+ list[index].from + "->" + list[index].to + ')');                       
       }
     });
   });

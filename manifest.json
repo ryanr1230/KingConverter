@@ -1,5 +1,6 @@
 {
   "name": "KingConverter",
+  "short_name":"kgC",
   "description": "Converting anything you want and back instantly in your webpage!",
   "version": "0.0.1",
   "options_page":"option/option.html",  
