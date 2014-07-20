@@ -1,26 +1,30 @@
 
 var listOfAdded = document.getElementById('listofadded');
-
+var listOfCurrencyAdded = document.getElementById('listofcurrencyadded');
 function relist () {
   chrome.storage.sync.get(function(Items) {
     listOfAdded.innerHTML = '';
+    listOfCurrencyAdded.innerHTML = '';
     for(var q in Items.userConv) {
-      addRadioAdded(q,Items.userConv[q].title + " with conversion factor " + Items.userConv[q].factor + " and Tag " + Items.userConv[q].tag + "<br>");
+      addRadioAdded(listOfAdded,q,Items.userConv[q].title + " with conversion factor " + Items.userConv[q].factor + " and Tag " + Items.userConv[q].tag + "<br>");
+    }
+    for(var x in Items.userCurrencyConv) {
+      addRadioAdded(listOfCurrencyAdded,x,"Currency Conversion from " + Items.userCurrencyConv[x].firstCurr + " to " + Items.userCurrencyConv[x].secondCurr + "<br>")
     }
   });
 }
 
-function addRadioAdded(value,inside) {
+function addRadioAdded(loc,value,inside) {
   var label = document.createElement('label');
   label.setAttribute('class','containradio');
   var newRadio = document.createElement('input');
   newRadio.setAttribute('type','radio');
   newRadio.setAttribute('value',value);
-  newRadio.setAttribute('name','added');
+  newRadio.setAttribute('name', loc.id);
   newRadio.setAttribute('class','radiobutton');
   label.appendChild(newRadio);
   label.innerHTML += "<span>" + inside + "</span>";
-  listOfAdded.appendChild(label);
+  loc.appendChild(label);
 }
 
 function add_options() {
@@ -65,13 +69,20 @@ function add_currency_options() {
 function delete_options() {
   chrome.storage.sync.get(function(Items) {
     var newUserConv = Items.userConv;
-    var tempButtons = document.getElementsByName('added');
+    var newUserCurrencyConv = Items.userCurrencyConv;
+    var tempButtons = document.getElementsByName('listofadded');
     for(var z in tempButtons) {
       if(tempButtons[z].checked) {
         newUserConv.splice(tempButtons[z].value,1);
       }
     }
-    chrome.storage.sync.set({userConv:newUserConv}, function() {
+    var tempCurrencyButtons = document.getElementsByName('listofcurrencyadded');
+    for(var z in tempCurrencyButtons) {
+      if(tempCurrencyButtons[z].checked) {
+        newUserCurrencyConv.splice(tempCurrencyButtons[z].value,1);
+      }
+    }
+    chrome.storage.sync.set({userConv:newUserConv,userCurrencyConv:newUserCurrencyConv}, function() {
       var status = document.getElementById('status');
       status.textContent = 'Options deleted.';
       relist();
