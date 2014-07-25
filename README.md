@@ -19,3 +19,9 @@ First attempt at a Chrome Extension
 2. Click `options` under KingConverter
 3. Add a title and conversion factor (tag optional)
 4. Click add
+
+
+https://chrome.google.com/webstore/detail/kingconverter/cjnejggdphnihnmfplaogldagfhmjdoo
+
+
+LICENSE:MIT

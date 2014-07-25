@@ -2,7 +2,7 @@
   "name": "KingConverter",
   "short_name":"kgC",
   "description": "Converting anything you want and back instantly in your webpage!",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "options_page":"option/option.html",  
   "permissions": ["storage","contextMenus"],
   "background": {
